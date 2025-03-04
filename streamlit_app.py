@@ -2,6 +2,9 @@ import streamlit as st
 import pickle
 import numpy as np
 import pandas as pd
+from sklearn.metrics import accuracy_score, precision_score, recall_score, fbeta_score
+import plotly.express as px
+import plotly.graph_objects as go
 
 # Load trained model (including preprocessor)
 with open('model.pkl', 'rb') as model_file:
@@ -30,12 +33,7 @@ def main():
     paperless_billing = st.selectbox("Paperless Billing", ["Yes", "No"])
     payment_method = st.selectbox("Payment Method", ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"])
     tenure_binned = st.selectbox("Tenure Binned", ["0-12 months", "13-24 months", "25-48 months", "49-60 months", "61-72 months"])
-    monthly_charges = st.slider(
-    'Select Monthly Charges',
-    min_value=0.0,
-    max_value=120.0,
-    value=50.0,   # Default value
-    step=0.5)
+    monthly_charges = st.slider('Select Monthly Charges', min_value=0.0, max_value=120.0, value=50.0, step=0.5)
     st.write(f"Selected Monthly Charges: ${monthly_charges}")
 
     # Convert input to DataFrame with Yes/No to Binary Conversion
@@ -67,6 +65,57 @@ def main():
     # Display results
     st.write(f"### Churn Prediction: **{churn_prediction}**")
     st.write(f"Churn Probability: **{churn_proba:.2%}**")
+
+    # Model performance metrics
+    st.subheader("Model Performance Metrics")
+    # Assuming y_test and X_test are available for evaluation
+    if st.button("Show Performance Metrics"):
+        y_test = pd.read_csv('y_test.csv')  # Load y_test
+        X_test = pd.read_csv('X_test.csv')  # Load X_test
+        y_pred = best_model.predict(X_test)
+        
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        f2_score = fbeta_score(y_test, y_pred, beta=2)
+        
+        st.write(f"**F2 Score:** {f2_score:.4f}")
+        st.write(f"**Accuracy:** {accuracy:.4f}")
+        st.write(f"**Precision:** {precision:.4f}")
+        st.write(f"**Recall:** {recall:.4f}")
+
+    # Feature importance visualization (for tree-based models)
+    if st.button("Show Feature Importance"):
+        if hasattr(best_model, 'feature_importances_'):
+            feature_importance = best_model.feature_importances_
+            feature_names = X_test.columns
+            feature_df = pd.DataFrame({'Feature': feature_names, 'Importance': feature_importance}).sort_values(by='Importance', ascending=False)
+
+            fig = px.bar(feature_df, x='Importance', y='Feature', title='Feature Importance', orientation='h')
+            st.plotly_chart(fig)
+        else:
+            st.write("Feature importance is not available for this model.")
+
+    # Customizable themes
+    st.sidebar.header("Customize Theme")
+    theme = st.sidebar.selectbox("Select Theme", ["Light", "Dark", "Streamlit Default"])
+
+    if theme == "Light":
+        st.markdown(
+            """
+            <style>
+            body { background-color: #f0f0f0; color: #000; }
+            </style>
+            """, unsafe_allow_html=True
+        )
+    elif theme == "Dark":
+        st.markdown(
+            """
+            <style>
+            body { background-color: #2e2e2e; color: #fff; }
+            </style>
+            """, unsafe_allow_html=True
+        )
 
 if __name__ == "__main__":
     main()
