@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 # Load trained model (including preprocessor)
-with open('best_model.pkl', 'rb') as model_file:
+with open('model.pkl', 'rb') as model_file:
     best_model = pickle.load(model_file)
 
 # Define the Streamlit app
