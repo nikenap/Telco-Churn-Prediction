@@ -67,7 +67,9 @@ def main():
     # Display results
     st.write(f"### Churn Prediction: **{churn_prediction}**")
     st.write(f"Churn Probability: **{churn_proba:.2%}**")
-
+if __name__ == "__main__":
+    main()
+    
     # Customizable themes
     st.sidebar.header("Customize Theme")
     theme = st.sidebar.selectbox("Select Theme", ["Light", "Dark", "Streamlit Default"])
@@ -88,6 +90,3 @@ def main():
             </style>
             """, unsafe_allow_html=True
         )
-
-if __name__ == "__main__":
-    main()
