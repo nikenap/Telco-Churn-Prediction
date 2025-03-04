@@ -30,7 +30,13 @@ def main():
     paperless_billing = st.selectbox("Paperless Billing", ["Yes", "No"])
     payment_method = st.selectbox("Payment Method", ["Electronic check", "Mailed check", "Bank transfer (automatic)", "Credit card (automatic)"])
     tenure_binned = st.selectbox("Tenure Binned", ["0-12 months", "13-24 months", "25-48 months", "49-60 months", "61-72 months"])
-    monthly_charges = st.number_input("Monthly Charges", min_value=0.0, max_value=200.0, value=50.0)
+    monthly_charges = st.slider(
+    'Select Monthly Charges',
+    min_value=0.0,
+    max_value=120.0,
+    value=50.0,   # Default value
+    step=0.5)
+    st.write(f"Selected Monthly Charges: ${monthly_charges}")
 
     # Convert input to DataFrame with Yes/No to Binary Conversion
     input_data = pd.DataFrame({
